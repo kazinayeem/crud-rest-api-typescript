@@ -3,7 +3,6 @@ import express, {
   Request,
   Response,
   NextFunction,
-  ErrorRequestHandler,
 } from "express";
 import morgan from "morgan";
 import cors from "cors";
@@ -27,20 +26,17 @@ app.post("/post", async (req: Request, res: Response): Promise<Response> => {
 });
 app.use("/todo/", defaultRoute);
 
-app.use(
-  (
-    err: ErrorRequestHandler,
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    const message = err.message ? err.message : "this error is from server.ts";
-    const status = err.status ? err.status : 500;
-    res.status(status).json({
-      message: message,
-    });
-  }
-);
+interface CustomError extends Error {
+  status?: number;
+}
+
+app.use((err: CustomError, req: Request, res: Response, next: NextFunction) => {
+  const message = err.message ? err.status : "this error is from server.ts";
+  const status = err.status ? err.status : 500;
+  res.status(status).json({
+    message: message,
+  });
+});
 
 app.listen(3002, () => {
   db();
