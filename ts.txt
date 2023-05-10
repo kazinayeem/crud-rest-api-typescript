@@ -1,1 +1,0 @@
-yarn add -D @types/node @types/cors @types/morgan @types/mongoose @types/express 
